@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>BIBAN 💖💝</title>
+
+<style>
+  :root{
+    --bg1:#fff8fb;
+    --bg2:#fff0f6;
+    --accent1:#ff5577;
+    --accent2:#ff7a9b;
+  }
+
+  /* Page layout + background overlay */
+  html,body{
+    height:100%;
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+    background:
+      linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+      url("bg.jpg") no-repeat center center;
+    background-size: cover;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    position:relative; /* needed for absolute positioning of button */
+  }
+
+  /* Crossfade background layers */
+  #bg-crossfade {
+    position: fixed;
+    inset: 0;               /* top:0; right:0; bottom:0; left:0; */
+    z-index: -1;            /* behind page content */
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .bg-slide {
+    position: absolute;
+    inset: 0;
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transform: translateZ(0);
+    transition: opacity 1200ms ease-in-out; /* change 1200ms to control fade duration */
+  }
+  .bg-slide.active { opacity: 1; }
+
+  /* top message */
+  #msg {
+    max-width:86vw;
+    width: min(720px, 86vw);   /* give it a real usable width */
+    box-sizing: border-box;
+    padding: 8px 14px;        /* breathing room so words can wrap */
+    text-align: center;
+    color: #39FF14;
+    font-size: 38px;
+    font-weight: bold;
+    line-height: 1.4;
+    margin-bottom: 22px;
+    display: none;
+    z-index: 2;
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto;
+  }
+
+  /* ensure the paragraph inside formats like a normal paragraph */
+  #msg p {
+    margin: 0;
+    display: inline-block;
+    width: 100%;
+    text-align: inherit;
+    line-height: 1.45;
+  }
+
+  /* main circular button */
+  .btn {
+    width:160px;
+    height:160px;
+    border-radius:50%;
+    border:0;
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    background: radial-gradient(circle at 25% 20%, var(--accent2) 0%, var(--accent1) 70%);
+    box-shadow: 0 16px 36px rgba(255,85,119,0.16);
+    -webkit-tap-highlight-color: transparent;
+    position:absolute;
+    bottom:50px;   /* distance from bottom */
+    left:50%;
+    z-index: 10;
+    transform: translateX(-50%);
+  }
+
+  .btn svg { width:64%; height:64%; display:block; }
+
+  .pulse {
+    transform: scale(1.06);
+    transition: transform 200ms cubic-bezier(.2,.8,.2,1);
+  }
+
+  @media(min-width:700px){
+    .btn { width:180px; height:180px; bottom:80px; }
+    .btn svg { width:60%; height:60%; }
+  }
+
+  /* ensure your UI remains above the backgrounds */
+  body > * { position: relative; z-index: 1; }
+  
+#hint {
+  position: absolute;
+  bottom: 230px; /* place above the button */
+  left: 50%;
+  transform: translateX(-50%);
+  font-style: italic;
+  font-size: 26px;
+  color: #fff;
+  text-align: header;
+  background: none;   /* 👈 remove grey background */
+  padding: 0;         /* no extra spacing */
+  margin: 0;          /* remove paragraph margin */
+  width: auto;        /* shrink to text only */
+}
+/* small footer note */
+.note{position:fixed;bottom:8px;width:100%;text-align:center;font-size:16px;color:black;z-index:20}
+</style>
+</head>
+<body>
+
+  <!-- background crossfade container -->
+  <div id="bg-crossfade" aria-hidden="true">
+    <div id="bg-slide-a" class="bg-slide"></div>
+    <div id="bg-slide-b" class="bg-slide"></div>
+  </div>
+
+  <!-- error box (hidden unless errors occur) -->
+  <div id="errorBox" style="position:fixed;left:8px;right:8px;top:8px;padding:10px;background:#ffefef;color:#900;border:1px solid #f88;border-radius:8px;z-index:99999;display:none;white-space:pre-wrap;font-family:monospace;font-size:13px"></div>
+
+  <!-- message area -->
+  <div id="msg" role="status" aria-live="polite"></div>
+
+  <!-- AUDIO: place 'breakup.mp3' and other playlist files in the same folder as this HTML -->
+  <audio id="bgAudio" src="breakup.mp3" preload="auto" playsinline></audio>
+
+  <!-- play button -->
+  <button id="btn" class="btn" aria-label="Play — BIBAN">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+      <path d="M28 92c0-34 28-60 72-60s72 26 72 60"
+            stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.98"/>
+      <rect x="18" y="92" width="34" height="52" rx="9" ry="9"
+            fill="rgba(255,255,255,0.14)" stroke="#FFFFFF" stroke-width="1.1"/>
+      <rect x="148" y="92" width="34" height="52" rx="9" ry="9"
+            fill="rgba(255,255,255,0.14)" stroke="#FFFFFF" stroke-width="1.1"/>
+      <circle cx="100" cy="100" r="34" fill="rgba(255,255,255,0.06)" />
+      <path d="M92 84 L132 100 L92 116 Z" fill="#FFFFFF"/>
+    </svg>
+  </button>
+<p id="hint"><em>Tap the play button to progress…</em></p>
+
+<div class="note">made with love.</div>
+
+<script>
+/* --- simple on-page error reporter (so errors appear in #errorBox) --- */
+(function(){
+  function show(msg){
+    try {
+      const box = document.getElementById('#errorBox');
+      
+      
+      if(box){
+        box.style.display = 'block';
+        box.textContent = (box.textContent ? box.textContent + "\n\n" : "") + String(msg);
+      }
+    } catch(e){}
+    try { console.error('BIBAN-ERR:', msg); } catch(e){}
+  }
+  window.addEventListener('error', function(ev){
+    show((ev && ev.message ? ev.message : String(ev)) + (ev && ev.filename ? "\nAt: "+ev.filename+":"+ev.lineno+":"+ev.colno : ''));
+  });
+  window.addEventListener('unhandledrejection', function(ev){
+    show("Unhandled Promise Rejection: " + (ev && ev.reason ? ev.reason : String(ev)));
+  });
+  window.showBibanError = show;
+})();
+
+
+/* Improved typing + blinking cursor (drop-in) */
+function typeMessageWithCursor(text, container, doneCb) {
+  if (!container) { if (doneCb) doneCb(); return; }
+
+  // inject blink style once
+  if (!document.getElementById('biban-blink-style')) {
+    const s = document.createElement('style');
+    s.id = 'biban-blink-style';
+    s.textContent = `
+      @keyframes biban-blink { 50% { opacity: 0; } }
+      .biban-cursor { display:inline-block; animation: biban-blink 0.8s steps(1) infinite; }
+    `;
+    document.head.appendChild(s);
+  }
+
+  // show & clear container
+  container.style.display = 'block';
+  container.innerHTML = '';
+
+  // tokenize so tags like <br> are preserved
+  const tokens = [];
+  for (let i = 0; i < text.length; ) {
+    if (text[i] === '<') {
+      const end = text.indexOf('>', i);
+      if (end === -1) { tokens.push(text[i]); i++; }
+      else { tokens.push(text.slice(i, end + 1)); i = end + 1; }
+    } else {
+      tokens.push(text[i]); i++;
+    }
+  }
+
+  // DOM nodes
+  const textSpan = document.createElement('span');
+  const cursor = document.createElement('span');
+  cursor.className = 'biban-cursor';
+  cursor.setAttribute('aria-hidden','true');
+  cursor.textContent = '▮';                    // change to '|' if you prefer
+  cursor.style.marginLeft = '2px';
+  cursor.style.verticalAlign = 'bottom';
+  cursor.style.color = window._bibanCursorColor || '#fff';
+  
+
+  container.appendChild(textSpan);
+  container.appendChild(cursor);
+
+  // typing speed (ms per token). Default slower than before
+  const speedMs = (typeof window._bibanTypingSpeed === 'number') ? window._bibanTypingSpeed : 100;
+
+  let idx = 0;
+  (function step() {
+    if (idx < tokens.length) {
+      textSpan.innerHTML = textSpan.innerHTML + tokens[idx];
+      idx++;
+      setTimeout(step, speedMs);
+    } else {
+      // finished
+      cursor.style.opacity = '1';
+      if (typeof doneCb === 'function') doneCb();
+    }
+  })();
+}
+/* === SETUP ELEMENT REFERENCES === */
+const btn = document.getElementById('btn');
+const msg = document.getElementById('msg');
+const audio = document.getElementById('bgAudio');
+
+/* === FLIRTY LINES (kept your texts intact) === */
+const FLIRTY_LINES = [
+"<br>Heeey SHIRU....,","<br>Ni Kim...<br>(peter)","<br>I'm sure adi hukua unajua jinaangu,","<br>,Are you ready for <br>a scavanger hunt?","<br> follow my lead...","<br>Sorry for this nudity<br>.This app was made on Tirries tuesday...","<br>and Thickiana Thursday😂😂","<br>shshsh<br>kuna vampires huku🤫🤫","<br>SHIRU,","<br>You make my world sound like music 🎶💖" ,"<br>Every moment i imagine with you..."," feels like a song that never ends...",
+  "I don’t need the stars in the sky, I just need your smile to light up my night ✨😊.",
+  "Every time I think of you,SHIRU<br>, my heart skips a beat 💓🔥..<br>hehe..",
+  "SHIRU,<br>You’re the reason my favorite playlist is called *love* 🎧❤️.",
+  "If kisses were songs, I’d give you an entire album 🎶💋.",
+  "Being with you ,SHIRU,<br>feels like the sweetest melody I never want to end 🎼💕.","<br>I always miss the time i used to see you across the street...","chatting you and seeing you burst out laughing like crazy","<br>but distance....sisemi kitu","Na ile prank ya KRA😂😂","Anyways,i have alot to say but...","Let me summarize by saying...","I'm sorrounded by nothing but joy","upon remembering you my friend","aki i miss you😭😭😭",".......bye","🚶🏾‍♂️.....🚶🏾‍♂️.....🚶🏾‍♂️"," ","  ","👀","btw hatukudivorce ujue hivyo,<br> yu r still mine🙃🙃","bye sasa👋👋"
+];
+
+/* === PLAYLIST + MULTI-SONG CONTROL ===
+   Keep file names as they are in the folder. Edit these entries if your filenames differ. */
+const PLAYLIST = [
+  { file: "breakup.mp3", title: "Breakup" },
+  { file: "songtwo.mp3", title: "Song Two" },
+  { file: "songthree.mp3", title: "Song Three" },
+  { file: "songfour.mp3", title: "Song Four" },
+  { file: "songfive.mp3", title: "Song Five" },
+  { file: "songsix.mp3", title: "Song Six" },
+  { file: "songseven.mp3", title: "Song Seven" },
+  { file: "songeight.mp3", title: "Song Eight" },
+  { file: "songnine.mp3", title: "Song Nine" },
+  {file: "songten.mp3",title: "song Ten"}
+];
+let currentTrack = 0;
+
+function loadTrack(index, playNow = false) {
+  try {
+    index = ((index % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length; // wrap
+    currentTrack = index;
+    audio.src = PLAYLIST[currentTrack].file;
+    audio.load();
+    console.log("Now Playing:", PLAYLIST[currentTrack].title);
+    if (playNow) {
+      audio.play().catch(e => console.warn('Play failed:', e && e.message));
+    }
+  } catch (err) {
+    window.showBibanError && window.showBibanError('loadTrack error: ' + (err && err.message));
+  }
+}
+
+/* advance helpers */
+function nextTrack(play = true) { loadTrack(currentTrack + 1, play); }
+function prevTrack(play = true) { loadTrack(currentTrack - 1, play); }
+
+/* Try to start first track on load (autoplay may be blocked until user interaction) */
+window.addEventListener('DOMContentLoaded', () => {
+  loadTrack(0, false);
+  audio.play().catch(()=>{ /* autoplay blocked - will start on user tap */ });
+});
+
+/* when a track ends, advance to next (stop at end) */
+audio.addEventListener('ended', () => {
+  if (currentTrack < PLAYLIST.length - 1) {
+    nextTrack(true);
+  } else {
+    console.log('Playlist finished.');
+  }
+});
+
+/* === BACKGROUND CROSSFADE IMPLEMENTATION === */
+const BG_IMAGES = [
+  "bg1.jpg","bg2.jpg","bg3.jpg","bg4.jpg","bg5.jpg",
+  "bg6.jpg","bg7.jpg","bg8.jpg","bg9.jpg","bg10.jpg",
+  "bg11.jpg","bg12.jpg","bg13.jpg","bg14.jpg","bg15.jpg",
+  "bg16.jpg","bg17.jpg"
+];
+
+window._bibanTypingSpeed = 140;   // bigger = slower typing (try 90–200)
+window._bibanCursorColor = 'red'; // change cursor color if needed
+
+const changeBgOnClick = true;    // change on big button click
+const autoRotateSeconds = 0;     // >0 to auto rotate
+const FADE_MS = 1500;            // fade duration in milliseconds
+
+let bgA = null;
+let bgB = null;
+let currentBgIndex = -1;
+let activeIsA = true;
+
+function preloadBgImages(list){
+  list.forEach(s => { const i = new Image(); i.src = s; });
+}
+
+function setBackgroundByIndexCrossfade(index) {
+  const list = BG_IMAGES.filter(Boolean);
+  if (!list.length || !bgA || !bgB) return;
+
+  index = ((index % list.length) + list.length) % list.length;
+  if (index === currentBgIndex) return; // already visible
+
+  const nextUrl = list[index];
+
+  // choose which slide is hidden (the one we'll write into)
+  const writeEl = activeIsA ? bgB : bgA;
+  const showEl  = activeIsA ? bgA : bgB;
+
+  // set new image on hidden element
+  writeEl.style.backgroundImage = `url("${nextUrl}")`;
+  // make sure it's ready (small timeout to allow browser to apply bg before transition)
+  requestAnimationFrame(() => {
+    // bring the written element to opacity 1, hide the other
+    writeEl.classList.add('active');
+    showEl.classList.remove('active');
+    // flip active flag
+    activeIsA = !activeIsA;
+    currentBgIndex = index;
+  });
+}
+
+function setRandomBackgroundCrossfade() {
+  const list = BG_IMAGES.filter(Boolean);
+  if (!list.length) return;
+  let r;
+  if (list.length === 1) r = 0;
+  else {
+    do { r = Math.floor(Math.random() * list.length); } while (r === currentBgIndex);
+  }
+  setBackgroundByIndexCrossfade(r);
+}
+
+function nextBackground() {
+  setBackgroundByIndexCrossfade((currentBgIndex + 1) % BG_IMAGES.length);
+}
+
+/* Initialize crossfade after DOM ready */
+window.addEventListener('DOMContentLoaded', () => {
+  bgA = document.getElementById('bg-slide-a');
+  bgB = document.getElementById('bg-slide-b');
+
+  if (!bgA || !bgB) {
+    console.warn('bg-crossfade elements not found; crossfade disabled');
+    return;
+  }
+
+  // set transitions to match FADE_MS
+  bgA.style.transition = `opacity ${FADE_MS}ms ease-in-out`;
+  bgB.style.transition = `opacity ${FADE_MS}ms ease-in-out`;
+
+  preloadBgImages(BG_IMAGES);
+
+  // initialize both layers so we don't see empty flash
+  bgA.style.backgroundImage = `url("${BG_IMAGES[0] || ''}")`;
+  bgA.classList.add('active');
+  bgB.style.backgroundImage = `url("${BG_IMAGES.length > 1 ? BG_IMAGES[1] : BG_IMAGES[0] || ''}")`;
+  bgB.classList.remove('active');
+  currentBgIndex = 0;
+  activeIsA = true;
+
+  // then pick a true random one immediately (so first load is not always index 0)
+  setTimeout(setRandomBackgroundCrossfade, 200);
+
+  if (autoRotateSeconds && autoRotateSeconds > 0) {
+    setInterval(setRandomBackgroundCrossfade, autoRotateSeconds * 1000);
+  }
+
+  if (changeBgOnClick && typeof btn !== "undefined" && btn) {
+    btn.addEventListener('click', () => {
+      setRandomBackgroundCrossfade();
+    }, { passive: true });
+  }
+});
+
+/* === BUTTON: show sequential flirty messages + ensure audio plays on tap === */
+let currentIndex = 0;
+
+btn.addEventListener('click', () => {document.getElementById('hint').style.display = 'none';
+  try {
+    // visual pulse
+    btn.classList.add('pulse');
+    setTimeout(()=> btn.classList.remove('pulse'), 220);
+
+    // show the current flirty message (as a paragraph)
+    // show the current flirty message (typed with blinking cursor)
+typeMessageWithCursor(FLIRTY_LINES[currentIndex], msg, function(){
+  // advance the index only after typing finishes
+});
+    // advance index (wrap)
+    currentIndex = (currentIndex + 1) % FLIRTY_LINES.length;
+
+    // ensure audio plays on click (if paused)
+    if (audio && audio.paused) {
+      audio.play().catch(e => {
+        console.warn('Could not play audio on button click:', e && e.message);
+      });
+    }
+  } catch (err) {
+    window.showBibanError && window.showBibanError('Button handler error: ' + (err && err.message));
+  }
+}); 
+</script>
+</body>
+</html>
