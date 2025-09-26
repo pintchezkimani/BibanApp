@@ -31,8 +31,6 @@
     <platform name="android">
         <allow-intent href="market:*" />
         <preference name="android-minSdkVersion" value="22" />
-
-        <!-- App icon -->
-        <icon src="www/res/icon.png" />
+        <icon src="res/icon.png" />
     </platform>
 </widget>
