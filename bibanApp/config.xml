@@ -1,11 +1,35 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.yourname.biban" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.pintchezkimani.biban" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>BIBAN 💖💝</name>
     <description>Sample Apache Cordova App</description>
-    <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
-        Apache Cordova Team
+    <author email="pintchezkimani@example.com" href="https://github.com/pintchezkimani">
+        Pintchez Kimani
     </author>
+
+    <!-- Start page -->
     <content src="index.html" />
+
+    <!-- Allow navigation -->
+    <allow-navigation href="*" />
+
+    <!-- External intents -->
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+
+    <!-- Preferences -->
+    <preference name="Fullscreen" value="true" />
+    <preference name="Orientation" value="portrait" />
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="BackupWebStorage" value="none" />
+    <preference name="SplashScreenDelay" value="3000" />
+
+    <!-- Platform specific -->
+    <platform name="android">
+        <allow-intent href="market:*" />
+        <preference name="android-minSdkVersion" value="22" />
+    </platform>
 </widget>
